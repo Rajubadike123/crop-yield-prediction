@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Recommendation System</title>
+    <style>
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('rice-rice-seeds-agriculture-harvesting.jpg') center center/cover no-repeat fixed; /* Background image with overlay */
+            margin: 0;
+            padding: 20px;
+            overflow: auto;
+            color: #2d3748; /* Text color */
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #2a4365;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            color: #2d3748;
+            font-weight: bold;
+        }
+        select, input[type="submit"] {
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #cbd5e0;
+            border-radius: 5px;
+            width: 100%;
+        }
+        input[type="submit"] {
+            background-color: #3182ce;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        input[type="submit"]:hover {
+            background-color: #63b3ed;
+            transform: translateY(-2px);
+        }
+        .response-box {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e6e6e6;
+            border-radius: 5px;
+            display: none; /* Initially hidden */
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            margin-top: 20px;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+         
+       
+    </style>
+</head>
+<body>
+    <div class="container animation">
+        <h1>Crop Recommendation System</h1>
+        <form action="/recommend" method="post">
+            <label for="district">District:</label>
+            <select name="district" id="district">
+                <option value="Select">Select</option>
+                {% for district in districts %}
+                <option value="{{ district }}">{{ district }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="soil_color">Soil Color:</label>
+            <select name="soil_color" id="soil_color">
+                <option value="Select">Select</option>
+                {% for color in soil_colors %}
+                <option value="{{ color }}">{{ color }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="nitrogen">Nitrogen (kg/ha):</label>
+            <select name="nitrogen" id="nitrogen">
+                <option value="Select">Select</option>
+                {% for nitrogen in nitrogen_levels %}
+                <option value="{{ nitrogen }}">{{ nitrogen }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="phosphorus">Phosphorus (kg/ha):</label>
+            <select name="phosphorus" id="phosphorus">
+                <option value="Select">Select</option>
+                {% for phosphorus in phosphorus_levels %}
+                <option value="{{ phosphorus }}">{{ phosphorus }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="potassium">Potassium (kg/ha):</label>
+            <select name="potassium" id="potassium">
+                <option value="Select">Select</option>
+                {% for potassium in potassium_levels %}
+                <option value="{{ potassium }}">{{ potassium }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="ph">pH Level:</label>
+            <select name="ph" id="ph">
+                <option value="Select">Select</option>
+                {% for ph in ph_levels %}
+                <option value="{{ ph }}">{{ ph }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="rainfall">Rainfall (mm):</label>
+            <select name="rainfall" id="rainfall">
+                <option value="Select">Select</option>
+                {% for rainfall in rainfall_levels %}
+                <option value="{{ rainfall }}">{{ rainfall }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="temperature">Temperature (°C):</label>
+            <select name="temperature" id="temperature">
+                <option value="Select">Select</option>
+                {% for temperature in temperature_levels %}
+                <option value="{{ temperature }}">{{ temperature }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="submit" value="Recommend Crop">
+        </form>
+        <div id="responseBox" class="response-box"></div>
+    </div>
+
+    <script>
+        function submitForm() {
+            var formData = new FormData(document.getElementById('recommendForm'));
+            fetch('/recommend', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+            .then(data => {
+                var responseBox = document.getElementById('responseBox');
+                responseBox.style.display = 'block';
+                responseBox.innerHTML = `
+                    <strong>Recommended Crop:</strong> ${data.predicted_crop}<br>
+                    <strong>Recommended Fertilizer:</strong> ${data.recommended_fertilizer}<br>
+                    <strong>Information Link:</strong> <a href="${data.link}" target="_blank">Click here</a>
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/${getYoutubeID(data.link)}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                `;
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function getYoutubeID(url) {
+            var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+            var match = url.match(regExp);
+            return (match && match[7].length == 11) ? match[7] : false;
+        }
+    </script>
+</body>
+</html>
