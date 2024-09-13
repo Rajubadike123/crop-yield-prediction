@@ -3,6 +3,5 @@ gunicorn
 Flask
 pandas
 scikit-learn==0.24.2
-pyttsx3==2.90
-espeak==0.5
+
 
